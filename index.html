@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grove District — Staff Hub</title>
+<link rel="icon" href="/assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --burgundy:#6E2436; --burgundy-deep:#511A28;
+    --navy:#1C2B45; --navy-deep:#131F33;
+    --cream:#F3ECDE; --cream-line:#E4D9C4;
+    --ink:#241F1C; --ink-soft:#6B6259;
+    --ochre:#B9832E; --sage:#5C7A52; --white:#FFFCF7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Public Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-0.01em;margin:0;}
+  .app{max-width:960px;margin:0 auto;padding:28px 20px 64px;}
+
+  .hub-header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:24px;}
+  .hub-header .brand{display:flex;align-items:center;gap:10px;}
+  .hub-header .mark{width:38px;height:auto;}
+  .hub-header h1{font-size:26px;color:var(--navy-deep);}
+  .hub-header .sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .who{text-align:right;font-size:13px;color:var(--ink-soft);}
+  .who .name{color:var(--ink);font-weight:600;}
+  .logout-link{background:none;border:none;color:var(--burgundy);font-size:12.5px;cursor:pointer;padding:0;text-decoration:underline;font-family:inherit;}
+
+  .login-wrap{max-width:420px;margin:8vh auto 0;}
+  .login-card{background:var(--white);border:1px solid var(--ink);padding:36px 32px 30px;}
+  .logo-icon{width:84px;height:auto;display:block;margin:0 auto 14px;}
+  .court-line{height:3px;background:var(--navy);margin:0 0 26px;position:relative;}
+  .court-line::after{content:"";position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:1px;height:13px;background:var(--navy);}
+  .login-card h1{font-size:28px;color:var(--navy-deep);margin-bottom:4px;text-align:center;}
+  .login-card .tag{font-size:13px;color:var(--ink-soft);margin-bottom:26px;text-align:center;}
+
+  label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;margin-top:16px;font-weight:600;}
+  select,input,textarea{width:100%;padding:10px 11px;font-size:14.5px;font-family:inherit;border:1px solid #C9BDA8;background:var(--white);color:var(--ink);}
+  select:focus,input:focus,textarea:focus{outline:2px solid var(--navy);outline-offset:1px;}
+
+  .btn{border:none;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;padding:11px 20px;}
+  .btn:disabled{opacity:.55;cursor:default;}
+  .btn-primary{background:var(--burgundy);color:var(--white);}
+  .btn-primary:hover:not(:disabled){background:var(--burgundy-deep);}
+  .btn-ghost{background:transparent;color:var(--navy-deep);border:1px solid var(--navy-deep);}
+  .btn-ghost:hover:not(:disabled){background:var(--navy-deep);color:var(--white);}
+  .btn-sm{padding:7px 13px;font-size:12.5px;}
+  .btn-block{width:100%;margin-top:22px;}
+  .err{color:var(--burgundy);font-size:12.5px;margin-top:10px;min-height:16px;}
+
+  .tabs{display:flex;margin-bottom:22px;border-bottom:1px solid var(--cream-line);flex-wrap:wrap;}
+  .tab{background:none;border:none;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink-soft);padding:10px 4px;margin-right:22px;cursor:pointer;border-bottom:2px solid transparent;}
+  .tab.active{color:var(--navy-deep);border-bottom-color:var(--burgundy);}
+
+  .panel{background:var(--white);border:1px solid var(--cream-line);margin-bottom:16px;}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--cream-line);flex-wrap:wrap;}
+  .panel-head h2{font-size:16px;color:var(--navy-deep);}
+  .panel-body{padding:18px;}
+
+  .today-block{padding:18px;border-left:4px solid var(--burgundy);}
+  .today-label{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:8px;}
+  .today-shift{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:4px 0;}
+  .today-post{font-family:'Fraunces',serif;font-size:20px;color:var(--navy-deep);font-weight:600;}
+  .today-time{font-size:14px;color:var(--ink-soft);white-space:nowrap;}
+  .today-none{font-size:14px;color:var(--ink-soft);}
+
+  .clock-face{text-align:center;padding:26px 18px 22px;}
+  .clock-time{font-family:'Fraunces',serif;font-size:42px;color:var(--navy-deep);font-weight:600;}
+  .clock-date{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .clock-status{display:inline-block;margin:16px 0 20px;padding:5px 12px;font-size:12px;font-weight:600;border:1px solid var(--sage);color:var(--sage);}
+  .clock-status.off{border-color:var(--ink-soft);color:var(--ink-soft);}
+  .clock-btn{width:100%;padding:16px;font-size:15px;}
+
+  .row-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream-line);}
+  .row-item:last-child{border-bottom:none;}
+  .row-item .meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
+  .pill{font-size:11px;font-weight:700;padding:3px 9px;white-space:nowrap;}
+  .pill-pending{background:#F2E4C6;color:var(--ochre);}
+  .pill-approved{background:#E3EADF;color:var(--sage);}
+  .pill-denied{background:#F0DEE1;color:var(--burgundy);}
+  .empty{color:var(--ink-soft);font-size:13.5px;padding:6px 0;}
+  .btn-row{display:flex;gap:8px;}
+  .inline-form{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+  .inline-form .field{flex:1;min-width:130px;}
+  .inline-form label{margin-top:0;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:11px;color:var(--ink-soft);border-bottom:1px solid var(--ink);padding:6px 8px 8px 0;font-weight:600;}
+  td{padding:9px 8px 9px 0;border-bottom:1px solid var(--cream-line);vertical-align:top;}
+  .week-nav{display:flex;align-items:center;gap:10px;font-size:13px;}
+  .loading{padding:60px;text-align:center;color:var(--ink-soft);}
+  @media(max-width:620px){.hub-header h1{font-size:21px;} .clock-time{font-size:36px;}}
+</style>
+</head>
+<body>
+<div id="root" class="app"><div class="loading">Loading…</div></div>
+
+<script>
+(function(){
+  let user=null, activeTab='home', adminTab='requests', weekAnchor=startOfWeek(new Date());
+  let msg='';
+  const root=document.getElementById('root');
+
+  /* ---------- api ---------- */
+  async function api(path, opts={}){
+    const res = await fetch('/api/'+path, {
+      method: opts.method||'GET',
+      headers:{'Content-Type':'application/json'},
+      credentials:'same-origin',
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    let data={};
+    try{ data = await res.json(); }catch{}
+    if(!res.ok) throw new Error(data.error || 'Request failed.');
+    return data;
+  }
+
+  /* ---------- date helpers ---------- */
+  function startOfWeek(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x;}
+  function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+  function fmtDate(s){const d=new Date(s+'T00:00:00');return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});}
+  function fmtTime(ms){return new Date(ms).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+  function todayLocal(){return iso(new Date());}
+
+  /* ---------- dom helper ---------- */
+  function el(tag,attrs,text){const n=document.createElement(tag);if(attrs)for(const k in attrs)n.setAttribute(k,attrs[k]);if(text!==undefined)n.textContent=text;return n;}
+  function field(labelText,node){const w=document.createElement('div');w.className='field';w.appendChild(el('label',{},labelText));w.appendChild(node);return w;}
+  function input(type,id,ph,val){const i=document.createElement('input');i.type=type;i.id=id;if(ph)i.placeholder=ph;if(val)i.value=val;return i;}
+  function setLoading(){root.innerHTML='<div class="loading">Loading…</div>';}
+
+  /* ---------- boot ---------- */
+  async function boot(){
+    try{
+      const me = await api('me');
+      user = me.user;
+      renderApp();
+    }catch{
+      const st = await api('status').catch(()=>({needsSetup:false}));
+      renderLogin(st.needsSetup);
+    }
+  }
+
+  /* ---------- login ---------- */
+  function renderLogin(needsSetup){
+    root.innerHTML='';
+    const wrap=el('div',{class:'login-wrap'});
+    const card=el('div',{class:'login-card'});
+    const logo=el('img',{class:'logo-icon',src:'/assets/logo.png',alt:'Grove District'});
+    card.appendChild(logo);
+    card.appendChild(el('div',{class:'court-line'}));
+
+    if(needsSetup){
+      card.appendChild(el('h1',{},'Set up Grove District'));
+      card.appendChild(el('div',{class:'tag'},'Create the first admin account to get started.'));
+      card.appendChild(field('Your name', input('text','f-name','e.g. Maria Santos')));
+      card.appendChild(field('Choose a PIN (4+ digits)', input('password','f-pin','')));
+      const e=el('div',{class:'err'},msg); card.appendChild(e);
+      const b=el('button',{class:'btn btn-primary btn-block'},'Create admin account');
+      b.onclick=async()=>{
+        b.disabled=true;
+        try{
+          const r=await api('setup',{method:'POST',body:{name:document.getElementById('f-name').value.trim(),pin:document.getElementById('f-pin').value.trim()}});
+          user=r.user; msg=''; renderApp();
+        }catch(ex){ msg=ex.message; b.disabled=false; renderLogin(true); }
+      };
+      card.appendChild(b);
+    } else {
+      card.appendChild(el('h1',{},'Grove District'));
+      card.appendChild(el('div',{class:'tag'},'Clock in, check your shift, request time off'));
+      card.appendChild(field('Name', input('text','f-name','Your name')));
+      card.appendChild(field('PIN', input('password','f-pin','')));
+      const e=el('div',{class:'err'},msg); card.appendChild(e);
+      const b=el('button',{class:'btn btn-primary btn-block'},'Log in');
+      const go=async()=>{
+        b.disabled=true;
+        try{
+          const r=await api('login',{method:'POST',body:{name:document.getElementById('f-name').value.trim(),pin:document.getElementById('f-pin').value.trim()}});
+          user=r.user; msg=''; renderApp();
+        }catch(ex){ msg=ex.message; b.disabled=false; renderLogin(false); }
+      };
+      b.onclick=go;
+      card.addEventListener('keydown',ev=>{if(ev.key==='Enter')go();});
+      card.appendChild(b);
+    }
+    wrap.appendChild(card); root.appendChild(wrap);
+    const first=document.getElementById('f-name'); if(first)first.focus();
+  }
+
+  /* ---------- shell ---------- */
+  function renderApp(){
+    root.innerHTML='';
+    const header=el('div',{class:'hub-header'});
+    const brand=el('div',{class:'brand'});
+    brand.appendChild(el('img',{class:'mark',src:'/assets/logo.png',alt:''}));
+    const bc=document.createElement('div');
+    bc.appendChild(el('h1',{},'Grove District'));
+    bc.appendChild(el('div',{class:'sub'},'Staff hub'));
+    brand.appendChild(bc); header.appendChild(brand);
+
+    const who=el('div',{class:'who'});
+    who.appendChild(el('div',{class:'name'}, user.name+(user.role==='admin'?' · Admin':'')));
+    const lo=el('button',{class:'logout-link'},'Log out');
+    lo.onclick=async()=>{ await api('logout',{method:'POST'}).catch(()=>{}); user=null; activeTab='home'; boot(); };
+    who.appendChild(lo); header.appendChild(who);
+    root.appendChild(header);
+
+    const tabs=el('div',{class:'tabs'});
+    const list=[['home','Home'],['timeoff','Time off'],['schedule','My schedule']];
+    if(user.role==='admin') list.push(['admin','Admin']);
+    list.forEach(([k,l])=>{
+      const t=el('button',{class:'tab'+(activeTab===k?' active':'')},l);
+      t.onclick=()=>{activeTab=k;renderApp();};
+      tabs.appendChild(t);
+    });
+    root.appendChild(tabs);
+
+    const content=el('div',{id:'content'});
+    root.appendChild(content);
+    content.innerHTML='<div class="loading">Loading…</div>';
+
+    if(activeTab==='home') loadHome(content);
+    else if(activeTab==='timeoff') loadTimeOff(content);
+    else if(activeTab==='schedule') loadSchedule(content);
+    else if(activeTab==='admin') loadAdmin(content);
+  }
+
+  function panelHead(title,action){
+    const h=el('div',{class:'panel-head'});
+    h.appendChild(el('h2',{},title));
+    if(action)h.appendChild(action);
+    return h;
+  }
+  function statusPill(s){
+    const map={pending:['pill-pending','Pending'],approved:['pill-approved','Approved'],denied:['pill-denied','Declined']};
+    const [c,l]=map[s]||map.pending;
+    return el('span',{class:'pill '+c},l);
+  }
+  function showError(container,message){
+    container.innerHTML='';
+    const p=el('div',{class:'panel'});
+    const b=el('div',{class:'panel-body'});
+    b.appendChild(el('div',{class:'err'},message));
+    p.appendChild(b);container.appendChild(p);
+  }
+
+  /* ---------- home ---------- */
+  async function loadHome(c){
+    let d;
+    try{ d=await api('home'); }catch(e){ return showError(c,e.message); }
+    c.innerHTML='';
+
+    const tp=el('div',{class:'panel'});
+    const tb=el('div',{class:'panel-body today-block'});
+    tb.appendChild(el('div',{class:'today-label'},"Today's position"));
+    if(!d.todayShifts.length){
+      tb.appendChild(el('div',{class:'today-none'},'Nothing scheduled for you today.'));
+    } else {
+      d.todayShifts.forEach(s=>{
+        const line=el('div',{class:'today-shift'});
+        line.appendChild(el('div',{class:'today-post'}, s.position || 'On shift'));
+        line.appendChild(el('div',{class:'today-time'}, s.start_time+' – '+s.end_time));
+        tb.appendChild(line);
+      });
+    }
+    tp.appendChild(tb); c.appendChild(tp);
+
+    const cp=el('div',{class:'panel'});
+    const cb=el('div',{class:'panel-body clock-face'});
+    const t=el('div',{class:'clock-time',id:'live-clock'}, new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
+    cb.appendChild(t);
+    cb.appendChild(el('div',{class:'clock-date'}, new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})));
+    const open=d.openEntry;
+    cb.appendChild(el('div',{class:'clock-status'+(open?'':' off')}, open?('Clocked in since '+fmtTime(open.clock_in)):'Not clocked in'));
+    const btn=el('button',{class:'btn clock-btn '+(open?'btn-ghost':'btn-primary')}, open?'Clock out':'Clock in');
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      try{ await api('clock',{method:'POST'}); loadHome(c); }
+      catch(e){ btn.disabled=false; alert(e.message); }
+    };
+    cb.appendChild(btn);
+    cp.appendChild(cb); c.appendChild(cp);
+
+    const rp=el('div',{class:'panel'});
+    rp.appendChild(panelHead('Your recent shifts'));
+    const rb=el('div',{class:'panel-body'});
+    if(!d.recent.length) rb.appendChild(el('div',{class:'empty'},'No shifts logged yet.'));
+    d.recent.forEach(r=>{
+      const row=el('div',{class:'row-item'});
+      const left=document.createElement('div');
+      left.appendChild(el('div',{}, new Date(r.clock_in).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})));
+      left.appendChild(el('div',{class:'meta'}, fmtTime(r.clock_in)+' – '+(r.clock_out?fmtTime(r.clock_out):'still clocked in')));
+      row.appendChild(left); rb.appendChild(row);
+    });
+    rp.appendChild(rb); c.appendChild(rp);
+  }
+
+  /* ---------- time off ---------- */
+  async function loadTimeOff(c){
+    let d;
+    try{ d=await api('timeoff'); }catch(e){ return showError(c,e.message); }
+    c.innerHTML='';
+
+    const fp=el('div',{class:'panel'});
+    fp.appendChild(panelHead('Request time off'));
+    const fb=el('div',{class:'panel-body'});
+    const form=el('div',{class:'inline-form'});
+    form.appendChild(field('Start date', input('date','t-start','',todayLocal())));
+    form.appendChild(field('End date', input('date','t-end','',todayLocal())));
+    const rw=field('Reason (optional)', input('text','t-reason','e.g. Family event'));
+    rw.style.flexBasis='100%';
+    form.appendChild(rw);
+    fb.appendChild(form);
+    const e=el('div',{class:'err',id:'t-err'},''); fb.appendChild(e);
+    const b=el('button',{class:'btn btn-primary'},'Submit request');
+    b.style.marginTop='6px';
+    b.onclick=async()=>{
+      b.disabled=true;
+      try{
+        await api('timeoff',{method:'POST',body:{
+          startDate:document.getElementById('t-start').value,
+          endDate:document.getElementById('t-end').value,
+          reason:document.getElementById('t-reason').value.trim()
+        }});
+        loadTimeOff(c);
+      }catch(ex){ document.getElementById('t-err').textContent=ex.message; b.disabled=false; }
+    };
+    fb.appendChild(b); fp.appendChild(fb); c.appendChild(fp);
+
+    const lp=el('div',{class:'panel'});
+    lp.appendChild(panelHead('Your requests'));
+    const lb=el('div',{class:'panel-body'});
+    if(!d.requests.length) lb.appendChild(el('div',{class:'empty'},'No requests yet.'));
+    d.requests.forEach(r=>{
+      const row=el('div',{class:'row-item'});
+      const left=document.createElement('div');
+      left.appendChild(el('div',{}, r.start_date===r.end_date?fmtDate(r.start_date):fmtDate(r.start_date)+' → '+fmtDate(r.end_date)));
+      if(r.reason) left.appendChild(el('div',{class:'meta'},r.reason));
+      row.appendChild(left); row.appendChild(statusPill(r.status));
+      lb.appendChild(row);
+    });
+    lp.appendChild(lb); c.appendChild(lp);
+  }
+
+  /* ---------- my schedule ---------- */
+  async function loadSchedule(c){
+    const from=iso(weekAnchor), to=iso(addDays(weekAnchor,6));
+    let d;
+    try{ d=await api('schedule?from='+from+'&to='+to); }catch(e){ return showError(c,e.message); }
+    c.innerHTML='';
+    const p=el('div',{class:'panel'});
+    p.appendChild(panelHead('Your schedule', weekNav(()=>loadSchedule(c))));
+    const b=el('div',{class:'panel-body'});
+    if(!d.shifts.length) b.appendChild(el('div',{class:'empty'},'No shifts scheduled this week.'));
+    d.shifts.forEach(s=>{
+      const row=el('div',{class:'row-item'});
+      const left=document.createElement('div');
+      left.appendChild(el('div',{},fmtDate(s.shift_date)));
+      left.appendChild(el('div',{class:'meta'}, s.start_time+' – '+s.end_time+(s.position?' · '+s.position:'')));
+      row.appendChild(left); b.appendChild(row);
+    });
+    p.appendChild(b); c.appendChild(p);
+  }
+
+  function weekNav(reload){
+    const nav=el('div',{class:'week-nav'});
+    const p=el('button',{class:'btn btn-ghost btn-sm'},'← Prev');
+    p.onclick=()=>{weekAnchor=addDays(weekAnchor,-7);reload();};
+    const n=el('button',{class:'btn btn-ghost btn-sm'},'Next →');
+    n.onclick=()=>{weekAnchor=addDays(weekAnchor,7);reload();};
+    nav.appendChild(p);
+    nav.appendChild(el('span',{}, fmtDate(iso(weekAnchor))+' — '+fmtDate(iso(addDays(weekAnchor,6)))));
+    nav.appendChild(n);
+    return nav;
+  }
+
+  /* ---------- admin ---------- */
+  async function loadAdmin(c){
+    c.innerHTML='';
+    const sub=el('div',{class:'tabs'});
+    [['requests','Time-off requests'],['team','Team'],['scheduler','Build schedule'],['log','Clock log']].forEach(([k,l])=>{
+      const t=el('button',{class:'tab'+(adminTab===k?' active':'')},l);
+      t.onclick=()=>{adminTab=k;loadAdmin(c);};
+      sub.appendChild(t);
+    });
+    c.appendChild(sub);
+    const body=el('div',{}); body.innerHTML='<div class="loading">Loading…</div>';
+    c.appendChild(body);
+
+    if(adminTab==='requests') adminRequests(body,c);
+    else if(adminTab==='team') adminTeam(body,c);
+    else if(adminTab==='scheduler') adminScheduler(body,c);
+    else adminLog(body);
+  }
+
+  async function adminRequests(b,c){
+    let d;
+    try{ d=await api('admin/timeoff'); }catch(e){ return showError(b,e.message); }
+    b.innerHTML='';
+    const p=el('div',{class:'panel'});
+    p.appendChild(panelHead('Time-off requests'));
+    const bd=el('div',{class:'panel-body'});
+    if(!d.requests.length) bd.appendChild(el('div',{class:'empty'},'No requests yet.'));
+    d.requests.forEach(r=>{
+      const row=el('div',{class:'row-item'});
+      const left=document.createElement('div');
+      left.appendChild(el('div',{}, r.employee_name+' · '+(r.start_date===r.end_date?fmtDate(r.start_date):fmtDate(r.start_date)+' → '+fmtDate(r.end_date))));
+      if(r.reason) left.appendChild(el('div',{class:'meta'},r.reason));
+      row.appendChild(left);
+      if(r.status==='pending'){
+        const acts=el('div',{class:'btn-row'});
+        const ap=el('button',{class:'btn btn-primary btn-sm'},'Approve');
+        ap.onclick=async()=>{ap.disabled=true;try{await api('admin/timeoff',{method:'POST',body:{id:r.id,status:'approved'}});loadAdmin(c);}catch(e){alert(e.message);ap.disabled=false;}};
+        const dn=el('button',{class:'btn btn-ghost btn-sm'},'Decline');
+        dn.onclick=async()=>{dn.disabled=true;try{await api('admin/timeoff',{method:'POST',body:{id:r.id,status:'denied'}});loadAdmin(c);}catch(e){alert(e.message);dn.disabled=false;}};
+        acts.appendChild(ap);acts.appendChild(dn);row.appendChild(acts);
+      } else row.appendChild(statusPill(r.status));
+      bd.appendChild(row);
+    });
+    p.appendChild(bd); b.appendChild(p);
+  }
+
+  async function adminTeam(b,c){
+    let d;
+    try{ d=await api('admin/staff'); }catch(e){ return showError(b,e.message); }
+    b.innerHTML='';
+
+    const ap=el('div',{class:'panel'});
+    ap.appendChild(panelHead('Add staff'));
+    const ab=el('div',{class:'panel-body'});
+    const form=el('div',{class:'inline-form'});
+    form.appendChild(field('Name', input('text','a-name','')));
+    form.appendChild(field('PIN (4+ digits)', input('text','a-pin','')));
+    const rs=document.createElement('select'); rs.id='a-role';
+    [['staff','Staff'],['admin','Admin']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;rs.appendChild(o);});
+    form.appendChild(field('Role', rs));
+    ab.appendChild(form);
+    ab.appendChild(el('div',{class:'err',id:'a-err'},''));
+    const addBtn=el('button',{class:'btn btn-primary'},'Add to team');
+    addBtn.onclick=async()=>{
+      addBtn.disabled=true;
+      try{
+        await api('admin/staff',{method:'POST',body:{name:document.getElementById('a-name').value.trim(),pin:document.getElementById('a-pin').value.trim(),role:document.getElementById('a-role').value}});
+        loadAdmin(c);
+      }catch(e){document.getElementById('a-err').textContent=e.message;addBtn.disabled=false;}
+    };
+    ab.appendChild(addBtn); ap.appendChild(ab); b.appendChild(ap);
+
+    const lp=el('div',{class:'panel'});
+    lp.appendChild(panelHead('Team ('+d.staff.length+')'));
+    const lb=el('div',{class:'panel-body'});
+    d.staff.forEach(s=>{
+      const row=el('div',{class:'row-item'});
+      const left=document.createElement('div');
+      left.appendChild(el('div',{},s.name));
+      left.appendChild(el('div',{class:'meta'}, s.role==='admin'?'Admin':'Staff'));
+      row.appendChild(left);
+      const acts=el('div',{class:'btn-row'});
+      const rp=el('button',{class:'btn btn-ghost btn-sm'},'Reset PIN');
+      rp.onclick=async()=>{
+        const np=prompt('New PIN for '+s.name+' (4+ digits):');
+        if(!np)return;
+        try{await api('admin/staff/pin',{method:'POST',body:{id:s.id,pin:np.trim()}});alert('PIN updated. They will need to log in again.');}
+        catch(e){alert(e.message);}
+      };
+      acts.appendChild(rp);
+      if(s.id!==user.id){
+        const rm=el('button',{class:'btn btn-ghost btn-sm'},'Remove');
+        rm.onclick=async()=>{
+          if(!confirm('Remove '+s.name+'? This deletes their shifts and requests too.'))return;
+          try{await api('admin/staff',{method:'DELETE',body:{id:s.id}});loadAdmin(c);}catch(e){alert(e.message);}
+        };
+        acts.appendChild(rm);
+      }
+      row.appendChild(acts); lb.appendChild(row);
+    });
+    lp.appendChild(lb); b.appendChild(lp);
+  }
+
+  async function adminScheduler(b,c){
+    const from=iso(weekAnchor), to=iso(addDays(weekAnchor,6));
+    let staffD, shiftD;
+    try{
+      staffD=await api('admin/staff');
+      shiftD=await api('admin/shifts?from='+from+'&to='+to);
+    }catch(e){ return showError(b,e.message); }
+    b.innerHTML='';
+
+    const p=el('div',{class:'panel'});
+    p.appendChild(panelHead('Add a shift', weekNav(()=>loadAdmin(c))));
+    const bd=el('div',{class:'panel-body'});
+    const form=el('div',{class:'inline-form'});
+    const sel=document.createElement('select'); sel.id='s-emp';
+    staffD.staff.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);});
+    form.appendChild(field('Staff', sel));
+    form.appendChild(field('Date', input('date','s-date','',from)));
+    form.appendChild(field('Start', input('time','s-start','')));
+    form.appendChild(field('End', input('time','s-end','')));
+    const pw=field('Position', input('text','s-pos','e.g. Cafe counter, Court marshal'));
+    pw.style.flexBasis='100%';
+    form.appendChild(pw);
+    bd.appendChild(form);
+    bd.appendChild(el('div',{class:'err',id:'s-err'},''));
+    const add=el('button',{class:'btn btn-primary'},'Add shift');
+    add.onclick=async()=>{
+      add.disabled=true;
+      try{
+        await api('admin/shifts',{method:'POST',body:{
+          employeeId:document.getElementById('s-emp').value,
+          date:document.getElementById('s-date').value,
+          start:document.getElementById('s-start').value,
+          end:document.getElementById('s-end').value,
+          position:document.getElementById('s-pos').value.trim()
+        }});
+        loadAdmin(c);
+      }catch(e){document.getElementById('s-err').textContent=e.message;add.disabled=false;}
+    };
+    bd.appendChild(add); p.appendChild(bd); b.appendChild(p);
+
+    const gp=el('div',{class:'panel'});
+    gp.appendChild(panelHead('This week'));
+    const gb=el('div',{class:'panel-body'});
+    if(!shiftD.shifts.length) gb.appendChild(el('div',{class:'empty'},'No shifts added for this week yet.'));
+    else{
+      const tbl=document.createElement('table');
+      const hr=document.createElement('tr');
+      ['Day','Staff','Time','Position',''].forEach(h=>hr.appendChild(el('th',{},h)));
+      tbl.appendChild(hr);
+      shiftD.shifts.forEach(s=>{
+        const tr=document.createElement('tr');
+        tr.appendChild(el('td',{},fmtDate(s.shift_date)));
+        tr.appendChild(el('td',{},s.employee_name));
+        tr.appendChild(el('td',{},s.start_time+' – '+s.end_time));
+        tr.appendChild(el('td',{},s.position||''));
+        const td=document.createElement('td');
+        const rm=el('button',{class:'btn btn-ghost btn-sm'},'Remove');
+        rm.onclick=async()=>{try{await api('admin/shifts',{method:'DELETE',body:{id:s.id}});loadAdmin(c);}catch(e){alert(e.message);}};
+        td.appendChild(rm); tr.appendChild(td); tbl.appendChild(tr);
+      });
+      gb.appendChild(tbl);
+    }
+    gp.appendChild(gb); b.appendChild(gp);
+  }
+
+  async function adminLog(b){
+    let d;
+    try{ d=await api('admin/clocklog'); }catch(e){ return showError(b,e.message); }
+    b.innerHTML='';
+    const p=el('div',{class:'panel'});
+    p.appendChild(panelHead('Clock-in log'));
+    const bd=el('div',{class:'panel-body'});
+    if(!d.entries.length) bd.appendChild(el('div',{class:'empty'},'No clock-ins recorded yet.'));
+    else{
+      const tbl=document.createElement('table');
+      const hr=document.createElement('tr');
+      ['Staff','Date','In','Out','Hours'].forEach(h=>hr.appendChild(el('th',{},h)));
+      tbl.appendChild(hr);
+      d.entries.forEach(e=>{
+        const tr=document.createElement('tr');
+        tr.appendChild(el('td',{},e.employee_name));
+        tr.appendChild(el('td',{}, new Date(e.clock_in).toLocaleDateString('en-GB',{day:'numeric',month:'short'})));
+        tr.appendChild(el('td',{},fmtTime(e.clock_in)));
+        tr.appendChild(el('td',{}, e.clock_out?fmtTime(e.clock_out):'—'));
+        tr.appendChild(el('td',{}, e.clock_out?((e.clock_out-e.clock_in)/3600000).toFixed(2):'—'));
+        tbl.appendChild(tr);
+      });
+      bd.appendChild(tbl);
+    }
+    p.appendChild(bd); b.appendChild(p);
+  }
+
+  setInterval(()=>{
+    const lc=document.getElementById('live-clock');
+    if(lc) lc.textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  },20000);
+
+  boot();
+})();
+</script>
+</body>
+</html>
